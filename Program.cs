@@ -259,6 +259,7 @@ class Program
         decimal maxExpense = 0;
         decimal allExpensesTotal = 0;
         decimal averageExpenseSum;
+
         foreach (var expense in expenses)
         {
             allExpensesTotal += expense.Amount;
@@ -292,11 +293,17 @@ class Program
                 topCtg = category;
             }
 
+            int barSymbolCount = (int)(categoryTotal / allExpensesTotal * 50);
+
+            if (barSymbolCount > 30)
+            {
+                barSymbolCount = 30;
+            }
 
             if (categoryTotal > 0)
             {
                 decimal percentageCtg = categoryTotal / allExpensesTotal;
-                Console.WriteLine($"{category}: {categoryTotal:C} ({percentageCtg:P2})");
+                Console.WriteLine($"{category, -15} {new string('█', barSymbolCount)} {categoryTotal:C} ({percentageCtg:P2})");
             }
         }
 
