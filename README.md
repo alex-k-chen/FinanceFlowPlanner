@@ -14,7 +14,7 @@ A personal financial planning console application built with C# .NET that helps 
 <img width="353" height="514" alt="image" src="https://github.com/user-attachments/assets/6417d228-9c58-4688-8f89-1c02e57f9b8d" />
 
 #### ```Financial Analytics - Spending breakdown by category with visual statistics```
-<img width="356" height="375" alt="image" src="https://github.com/user-attachments/assets/482447d0-bc00-47be-977f-33167cced8dc" />
+<img width="562" height="353" alt="image" src="https://github.com/user-attachments/assets/942c68d9-679d-41c3-a1db-3871e73edd98" />
 
 ## ✨ Features
 
