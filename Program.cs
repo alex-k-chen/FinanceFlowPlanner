@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.NetworkInformation;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 
@@ -33,7 +34,8 @@ class Program
         Console.WriteLine("2. 🎯 View goals");
         Console.WriteLine("3. 💸 Add expense");
         Console.WriteLine("4. 📈 View expenses");
-        Console.WriteLine("5. 📊 Show analytics");
+        Console.WriteLine("5. 💰 Manage budgets");
+        Console.WriteLine("6. 📊 Show analytics");
         Console.WriteLine("0. 🚪 Exit");
         Console.Write("\nChoose option: ");
     }
@@ -350,6 +352,57 @@ class Program
         PrintColor($"{topCtg}", ConsoleColor.DarkYellow);
     }
 
+    decimal newCategoryBudget;
+    static void ManageBudgets()
+    {
+        Console.Clear();
+        PrintColor("\n╔══════════════════════════════════════╗", ConsoleColor.Blue);
+        PrintColor("║          💰 MANAGE BUDGETS           ║", ConsoleColor.Blue);
+        PrintColor("╚══════════════════════════════════════╝\n", ConsoleColor.Blue);
+
+        List<(ExpenseCategory categoryName, decimal total)> allCategories = [];
+
+        foreach (ExpenseCategory category in Enum.GetValues(typeof(ExpenseCategory)))
+        {
+            decimal categoryTotal = 0;
+
+            foreach (var expense in expenses)
+            {
+                if (expense.Category == category)
+                {
+                    categoryTotal += expense.Amount;
+                }
+            }
+
+            allCategories.Add((category, categoryTotal));
+        }
+
+        Console.WriteLine($"{"Category", -15} {"Spent", 0} {"Budget", 13} {"Status", 10}");
+        Console.WriteLine(new string('─', 50));
+
+        foreach (KeyValuePair<ExpenseCategory, decimal> categoryBudget in categoryBudgets)
+        {
+            foreach (var category in allCategories)
+            {
+                if (categoryBudget.Key == category.categoryName)
+                {
+                    if (category.total > categoryBudget.Value)
+                    {
+                        Console.Write($"{categoryBudget.Key, -15} ");
+                        PrintColor($"{category.total, 10:C}", ConsoleColor.Red, false);
+                        Console.Write($" / {categoryBudget.Value, 10:C} ");
+                        PrintColor("⚠️ OVERS", ConsoleColor.Red);
+                    }
+                    else
+                    {
+                        Console.Write($"{categoryBudget.Key, -15} {category.total, 10:C} / {categoryBudget.Value, 10:C} ");
+                        PrintColor("✅ OK", ConsoleColor.Green);
+                    }
+                }
+            }
+        }
+    }
+
     static Dictionary<ExpenseCategory, decimal> categoryBudgets = new()
     {
         { ExpenseCategory.Food, 400m },
@@ -401,6 +454,9 @@ class Program
                         ShowExpenses();
                         break;
                     case 5:
+                        ManageBudgets();
+                        break;
+                    case 6:
                         ShowAnalytics();
                         break;
                     default:
