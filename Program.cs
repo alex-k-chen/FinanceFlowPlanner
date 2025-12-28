@@ -1,11 +1,21 @@
-﻿using System.Text.Json;
+﻿using System.Net;
+using System.Security.Cryptography.X509Certificates;
+using System.Text.Json;
 
 class Program
 {
-    public static void PrintColor(string text, ConsoleColor color)
+    public static void PrintColor(string text, ConsoleColor color, bool make_enter = true)
     {
         Console.ForegroundColor = color;
-        Console.WriteLine(text);
+        
+        if (make_enter == true)
+        {
+            Console.WriteLine(text);
+            Console.ResetColor();
+            return;
+        }
+
+        Console.Write(text);
         Console.ResetColor();
     }
 
@@ -77,7 +87,7 @@ class Program
         Console.Clear();
         PrintColor("\n╔══════════════════════════════════════╗", ConsoleColor.DarkBlue);
         PrintColor("║            📋 GOALS LIST             ║", ConsoleColor.DarkBlue);
-        PrintColor("╚══════════════════════════════════════╝", ConsoleColor.DarkBlue);
+        PrintColor("╚══════════════════════════════════════╝\n", ConsoleColor.DarkBlue);
 
         if (goals.Count == 0)
         {
@@ -200,7 +210,7 @@ class Program
         Console.Clear();
         PrintColor("\n╔══════════════════════════════════════╗", ConsoleColor.DarkBlue);
         PrintColor("║           📋 EXPENSES LIST           ║", ConsoleColor.DarkBlue);
-        PrintColor("╚══════════════════════════════════════╝", ConsoleColor.DarkBlue);
+        PrintColor("╚══════════════════════════════════════╝\n", ConsoleColor.DarkBlue);
 
         if (expenses.Count == 0)
         {
@@ -220,7 +230,7 @@ class Program
                 TotalExpensesSum += expenses[i].Amount;
             }
 
-            Console.Write("Total spent: ");
+            Console.Write("\n💰 Total spent: ");
             PrintColor($"{TotalExpensesSum:C}", ConsoleColor.DarkGreen);
         }
     }
@@ -244,7 +254,7 @@ class Program
         Console.Clear();
         PrintColor("\n╔══════════════════════════════════════╗", ConsoleColor.Magenta);
         PrintColor("║             📊 ANALYTICS             ║", ConsoleColor.Magenta);
-        PrintColor("╚══════════════════════════════════════╝", ConsoleColor.Magenta);
+        PrintColor("╚══════════════════════════════════════╝\n", ConsoleColor.Magenta);
 
         if (expenses.Count == 0)
         {
@@ -254,6 +264,7 @@ class Program
         }
 
         ExpenseCategory topCtg = ExpenseCategory.Other;
+        List<(ExpenseCategory categoryName, decimal total)> overspentCategories = [];
         decimal maxAmount = 0;
         decimal minExpense = decimal.MaxValue;
         decimal maxExpense = 0;
@@ -268,6 +279,7 @@ class Program
         foreach (ExpenseCategory category in Enum.GetValues(typeof(ExpenseCategory)))
         {
             decimal categoryTotal = 0;
+            bool overspent = false;
 
             foreach (var expense in expenses)
             {
@@ -300,14 +312,35 @@ class Program
                 barSymbolCount = 30;
             }
 
+            if (categoryTotal > categoryBudgets[category])
+            {
+                overspent = true;
+            }
+
             if (categoryTotal > 0)
             {
                 decimal percentageCtg = categoryTotal / allExpensesTotal;
                 Console.WriteLine($"{category, -15} {new string('█', barSymbolCount)} {categoryTotal:C} ({percentageCtg:P2})");
             }
+
+            if (overspent == true)
+            {
+                overspentCategories.Add((category, categoryTotal));
+            }
         }
 
         averageExpenseSum = allExpensesTotal / expenses.Count;
+        
+        Console.WriteLine();
+        RecommendationEngine.GenerateTips(goals, expenses);
+
+        Console.WriteLine();
+        for (int i = 0; i < overspentCategories.Count; i++)
+        {
+            Console.Write($"{overspentCategories[i].categoryName} -> ");
+            PrintColor("⚠️ Overspent budget!", ConsoleColor.Yellow, false);
+            Console.WriteLine($" ({overspentCategories[i].total:C} / {categoryBudgets[overspentCategories[i].categoryName]:C})");
+        }
 
         Console.WriteLine($"\n🧾 Transactions: {expenses.Count}");
         Console.WriteLine($"⚖️ Average: {averageExpenseSum:C}");
@@ -316,6 +349,17 @@ class Program
         Console.Write("\n🏆 Top category: ");
         PrintColor($"{topCtg}", ConsoleColor.DarkYellow);
     }
+
+    static Dictionary<ExpenseCategory, decimal> categoryBudgets = new()
+    {
+        { ExpenseCategory.Food, 400m },
+        { ExpenseCategory.Transport, 200m },
+        { ExpenseCategory.Entertainment, 150m },
+        { ExpenseCategory.Bills, 1000m },
+        { ExpenseCategory.Shopping, 250m },
+        { ExpenseCategory.Health, 300m },
+        { ExpenseCategory.Other, 100m }
+    };
 
     static void Main()
     {
