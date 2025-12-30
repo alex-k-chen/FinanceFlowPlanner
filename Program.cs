@@ -1,10 +1,11 @@
-﻿using System.Net;
-using System.Net.NetworkInformation;
-using System.Security.Cryptography.X509Certificates;
-using System.Text.Json;
+﻿
 
 class Program
 {
+    public static Dictionary<ExpenseCategory, decimal> categoryBudgets = [];
+    public static List<FinancialGoal> goals = [];
+    public static List<Expense> expenses = [];
+
     public static void PrintColor(string text, ConsoleColor color, bool make_enter = true)
     {
         Console.ForegroundColor = color;
@@ -19,10 +20,6 @@ class Program
         Console.Write(text);
         Console.ResetColor();
     }
-
-    public static List<FinancialGoal> goals = [];
-
-    public static List<Expense> expenses = [];
 
     static void ShowMenu()
     {
@@ -352,7 +349,6 @@ class Program
         PrintColor($"{topCtg}", ConsoleColor.DarkYellow);
     }
 
-    decimal newCategoryBudget;
     static void ManageBudgets()
     {
         Console.Clear();
@@ -377,42 +373,87 @@ class Program
             allCategories.Add((category, categoryTotal));
         }
 
-        Console.WriteLine($"{"Category", -15} {"Spent", 0} {"Budget", 13} {"Status", 10}");
-        Console.WriteLine(new string('─', 50));
+        Console.WriteLine($"{"Category", -15} {"Spent", 9} {"Budget", 13} {"Status", 10}");
+        Console.WriteLine(new string('─', 58));
 
         foreach (KeyValuePair<ExpenseCategory, decimal> categoryBudget in categoryBudgets)
         {
-            foreach (var category in allCategories)
+            foreach (var (categoryName, total) in allCategories)
             {
-                if (categoryBudget.Key == category.categoryName)
+                if (categoryBudget.Key == categoryName)
                 {
-                    if (category.total > categoryBudget.Value)
+                    int index = (int)categoryBudget.Key + 1;
+
+                    if (total > categoryBudget.Value)
                     {
-                        Console.Write($"{categoryBudget.Key, -15} ");
-                        PrintColor($"{category.total, 10:C}", ConsoleColor.Red, false);
+                        Console.Write($"[{index}] {categoryBudget.Key, -15} ");
+                        PrintColor($"{total, 10:C}", ConsoleColor.Red, false);
                         Console.Write($" / {categoryBudget.Value, 10:C} ");
                         PrintColor("⚠️ OVERS", ConsoleColor.Red);
                     }
                     else
                     {
-                        Console.Write($"{categoryBudget.Key, -15} {category.total, 10:C} / {categoryBudget.Value, 10:C} ");
+                        Console.Write($"[{index}] {categoryBudget.Key, -15} {total, 10:C} / {categoryBudget.Value, 10:C} ");
                         PrintColor("✅ OK", ConsoleColor.Green);
                     }
                 }
             }
         }
-    }
 
-    static Dictionary<ExpenseCategory, decimal> categoryBudgets = new()
-    {
-        { ExpenseCategory.Food, 400m },
-        { ExpenseCategory.Transport, 200m },
-        { ExpenseCategory.Entertainment, 150m },
-        { ExpenseCategory.Bills, 1000m },
-        { ExpenseCategory.Shopping, 250m },
-        { ExpenseCategory.Health, 300m },
-        { ExpenseCategory.Other, 100m }
-    };
+        Console.WriteLine("\nMENU:");
+        Console.WriteLine("1. Edit budget");
+        Console.WriteLine("2. Main menu");
+        Console.Write("\nChoose option: ");
+        string? optionInput = Console.ReadLine();
+
+        if (int.TryParse(optionInput, out int option))
+        {
+            switch(option)
+            {
+                case 1:
+                    Console.WriteLine("BUDGET EDIT");
+                    Console.Write("Enter number of category: ");
+                    string? ctgNumberInput = Console.ReadLine();
+
+                    if (int.TryParse(ctgNumberInput, out int ctgNumber))
+                    {
+                        Console.Write("Enter new category budget: ");
+                        string? newBudgetInput = Console.ReadLine();
+
+                        if (decimal.TryParse(newBudgetInput, out decimal newBudget))
+                        {
+                            ExpenseCategory categoryName = (ExpenseCategory)(ctgNumber - 1);
+
+                            categoryBudgets[categoryName] = newBudget;
+                            JsonDataService.SaveBudgets(categoryBudgets);
+                            Console.Clear();
+                            Console.WriteLine($"✅ Budget of category '{categoryName}' changed to {newBudget:C}");
+                        }
+                        else
+                        {
+                            PrintColor("❌ Error: Wrong input format", ConsoleColor.Red);
+                        }
+                    }
+                    else
+                    {
+                        PrintColor("❌ Error: Wrong input format!", ConsoleColor.Red);
+                    }
+                    break;
+                case 2:
+                    Console.Clear();
+                    break;
+                default:
+                    Console.Clear();
+                    PrintColor("⚠️ Wrong menu index!", ConsoleColor.Yellow);
+                    break;
+            }
+        }
+        else
+        {
+            Console.Clear();
+            PrintColor("❌ Error: Wrong input format!", ConsoleColor.Red);
+        }
+    }
 
     static void Main()
     {
@@ -422,18 +463,22 @@ class Program
         System.Globalization.CultureInfo.DefaultThreadCurrentUICulture =
         new System.Globalization.CultureInfo("de-DE");
 
+        Console.WriteLine();
         ShowMotivation();
 
         var (loadedGoals, loadedExpenses) = JsonDataService.LoadData();
         goals = loadedGoals;
         expenses = loadedExpenses;
 
+        var loadedBudgets = JsonDataService.LoadBudgets();
+        categoryBudgets = loadedBudgets;
+
         while (true)
         {
             ShowMenu();
-            string? input = Console.ReadLine();
+            string? choiceInput = Console.ReadLine();
 
-            if (int.TryParse(input, out int choice))
+            if (int.TryParse(choiceInput, out int choice))
             {
                 switch (choice)
                 {
@@ -468,7 +513,7 @@ class Program
             else
             {
                 Console.Clear();
-                PrintColor("❌ Error: Write a number!", ConsoleColor.Red);
+                PrintColor("❌ Error: Wrong input format!", ConsoleColor.Red);
             }
         }
     }

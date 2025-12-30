@@ -3,6 +3,7 @@ using System.Text.Json;
 public static class JsonDataService
 {
     private const string FileName = "finance_data.json";
+    private const string FileNameBudgets = "budgets.json";
 
     public static void SaveData(List<FinancialGoal> goals, List<Expense> expenses)
     {
@@ -61,6 +62,68 @@ public static class JsonDataService
             Program.PrintColor($"⚠️ Error loading data: {ex.Message}", ConsoleColor.Red);
 
             return ([], []);
+        }
+    }
+
+    public static Dictionary<ExpenseCategory, decimal> GetDefaultBudgets()
+    {
+        return new()
+        {
+            { ExpenseCategory.Food, 400m },
+            { ExpenseCategory.Transport, 200m },
+            { ExpenseCategory.Entertainment, 150m },
+            { ExpenseCategory.Bills, 1000m },
+            { ExpenseCategory.Shopping, 250m },
+            { ExpenseCategory.Health, 300m },
+            { ExpenseCategory.Other, 100m }
+        };
+    }
+
+    public static void SaveBudgets(Dictionary<ExpenseCategory, decimal> categoryBudgets)
+    {
+        try
+        {
+            string DataBudgetSave = JsonSerializer.Serialize(categoryBudgets, new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                IgnoreReadOnlyProperties = true
+            });
+
+            File.WriteAllText(FileNameBudgets, DataBudgetSave);
+        }
+        catch (Exception ex)
+        {
+            Program.PrintColor($"⚠️ Error saving data: {ex.Message}", ConsoleColor.Red);
+        }
+    }
+
+    public static Dictionary<ExpenseCategory, decimal> LoadBudgets()
+    {
+        if (!File.Exists(FileNameBudgets))
+        {
+            return GetDefaultBudgets();
+        }
+
+        try
+        {
+            string DataReadJson = File.ReadAllText(FileNameBudgets);
+
+            var DataRead = JsonSerializer.Deserialize<Dictionary<ExpenseCategory, decimal>>(DataReadJson);
+
+            return DataRead ?? GetDefaultBudgets();
+        }
+        catch (JsonException)
+        {
+            Program.PrintColor("⚠️ Corrupted save file. Starting fresh!", ConsoleColor.Yellow);
+
+            return GetDefaultBudgets();
+        }
+        catch (Exception ex)
+        {
+            Program.PrintColor($"⚠️ Error loading data: {ex.Message}", ConsoleColor.Red);
+
+            return GetDefaultBudgets();
         }
     }
 }
