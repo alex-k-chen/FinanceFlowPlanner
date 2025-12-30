@@ -1,519 +1,88 @@
-﻿
+﻿using System.Globalization;
 
 class Program
 {
+    // Application global state - accessible from all parts of the program
     public static Dictionary<ExpenseCategory, decimal> categoryBudgets = [];
     public static List<FinancialGoal> goals = [];
     public static List<Expense> expenses = [];
 
-    public static void PrintColor(string text, ConsoleColor color, bool make_enter = true)
-    {
-        Console.ForegroundColor = color;
-        
-        if (make_enter == true)
-        {
-            Console.WriteLine(text);
-            Console.ResetColor();
-            return;
-        }
-
-        Console.Write(text);
-        Console.ResetColor();
-    }
-
-    static void ShowMenu()
-    {
-        PrintColor("\n╔══════════════════════════════════════╗", ConsoleColor.Green);
-        PrintColor("║       💸 FINANCE FLOW PLANNER        ║", ConsoleColor.Green);
-        PrintColor("╚══════════════════════════════════════╝", ConsoleColor.Green);
-        Console.WriteLine("\nMAIN MENU:");
-        Console.WriteLine("1. 📝 Add financial goal");
-        Console.WriteLine("2. 🎯 View goals");
-        Console.WriteLine("3. 💸 Add expense");
-        Console.WriteLine("4. 📈 View expenses");
-        Console.WriteLine("5. 💰 Manage budgets");
-        Console.WriteLine("6. 📊 Show analytics");
-        Console.WriteLine("0. 🚪 Exit");
-        Console.Write("\nChoose option: ");
-    }
-
-    static void AddFinancialGoal()
-    {
-        Console.Write("Enter goal description: ");
-        string? goalName = Console.ReadLine();
-
-        Console.Write("Enter target sum: ");
-        string? amountInput = Console.ReadLine();
-
-        Console.Write("Deadline (YYYY-MM-DD) or Enter for none: ");
-        string? deadlineInput = Console.ReadLine();
-
-        DateTime? deadline = null;
-
-        if (!string.IsNullOrWhiteSpace(deadlineInput))
-        {
-            if (!DateTime.TryParse(deadlineInput, out DateTime parsedDeadline))
-            {
-                Console.Clear();
-                PrintColor("❌ Error: Invalid deadline format!", ConsoleColor.Red);
-                return;
-            }
-
-            deadline = parsedDeadline;
-        }
-        if (decimal.TryParse(amountInput, out decimal amount))
-        {
-            FinancialGoal goal = new(
-                Name: string.IsNullOrEmpty(goalName) ? "Unnamed" : goalName,
-                TargetAmount: amount,
-                Deadline: deadline
-            );
-
-            goals.Add(goal);
-            JsonDataService.SaveData(goals, expenses);
-            Console.Clear();
-            PrintColor("✅ Goal was added!", ConsoleColor.Green);
-        }
-        else
-        {
-            Console.Clear();
-            PrintColor("❌ Error: The sum must be number!", ConsoleColor.Red);
-        }
-    }
-
-    static void ShowGoals()
-    {
-        Console.Clear();
-        PrintColor("\n╔══════════════════════════════════════╗", ConsoleColor.DarkBlue);
-        PrintColor("║            📋 GOALS LIST             ║", ConsoleColor.DarkBlue);
-        PrintColor("╚══════════════════════════════════════╝\n", ConsoleColor.DarkBlue);
-
-        if (goals.Count == 0)
-        {
-            Console.Clear();
-            PrintColor("⚠️ Goals list is empty!", ConsoleColor.Yellow);
-        }
-        else
-        {
-            for (int i = 0; i < goals.Count; i++)
-            {
-                Console.WriteLine($"┌─[{i + 1}]─ {goals[i].Name}");
-                Console.WriteLine($"│   Target: {goals[i].TargetAmount:C}");
-                Console.WriteLine($"│   Progress: {goals[i].CurrentAmount:C} / {goals[i].TargetAmount:C}");
-                Console.WriteLine($"│   Remaining: {goals[i].RemainingAmount:C}");
-                Console.WriteLine($"│   Deadline: {goals[i].DeadlineDisplay}");
-                Console.WriteLine($"└─────────────────────────────────────");
-            }
-            Console.Write("\nAdd money to some goal? (y/n): ");
-            string? add_money_input = Console.ReadLine();
-
-            if (char.TryParse(add_money_input, out char add_money) && (add_money == 'y' || add_money == 'Y'))
-            {
-                Console.Write("Enter the goal number: ");
-                string? goalNumInput = Console.ReadLine();
-
-                if (int.TryParse(goalNumInput, out int goalNum))
-                {
-                    if (goalNum < 1 || goalNum > goals.Count)
-                    {
-                        Console.Clear();
-                        PrintColor("❌ Error: The goal doesn't exist!", ConsoleColor.Red);
-                    }
-                    else
-                    {
-                        Console.Write("Enter sum of money: ");
-                        string? sumInput = Console.ReadLine();
-
-                        if (decimal.TryParse(sumInput, out decimal sum) && sum > 0)
-                        {
-                            goals[goalNum - 1] = goals[goalNum - 1].AddMoney(sum);
-                            JsonDataService.SaveData(goals, expenses);
-                            Console.Clear();
-                            PrintColor($"✅ {sum:C} was added!", ConsoleColor.Green);
-                            return;
-                        }
-                        else
-                        {
-                            Console.Clear();
-                            PrintColor("❌ Error: The sum must be a positive number!", ConsoleColor.Red);
-                        }
-                    }
-                }
-                else
-                {
-                    Console.Clear();
-                    PrintColor("❌ Error: Enter a number!", ConsoleColor.Red);
-                }
-            }
-            else
-            {
-                Console.Clear();
-            }
-        }
-    }
-
-    static void AddExpense()
-    {
-        Console.Write("Enter expense description: ");
-        string? expenseDesc = Console.ReadLine();
-
-        Console.WriteLine("Categories: 1.Food 2.Transport 3.Entertainment 4.Bills 5.Shopping 6.Health 7.Other");
-        Console.Write("Choose category (1-7): ");
-        string? categoryInput = Console.ReadLine();
-
-        Console.Write("Enter amount: ");
-        string? amountInput = Console.ReadLine();
-
-        Console.Write("Enter date (YYYY-MM-DD) or Enter for today: ");
-        string? dateInput = Console.ReadLine();
-
-        DateTime? date = null;
-
-        if (!string.IsNullOrWhiteSpace(dateInput))
-        {
-            if (!DateTime.TryParse(dateInput, out DateTime parsedDate))
-            {
-                Console.Clear();
-                PrintColor("❌ Error: Invalid date format!", ConsoleColor.Red);
-                return;
-            }
-
-            date = parsedDate;
-        }
-        if (int.TryParse(categoryInput, out int categoryNum) && (categoryNum >=1) && (categoryNum <=7) &&
-        decimal.TryParse(amountInput, out decimal amount) && amount > 0)
-        {
-            Expense expense = new(
-                Description: string.IsNullOrEmpty(expenseDesc) ? "Unnamed" : expenseDesc,
-                Category: (ExpenseCategory)(categoryNum - 1),
-                Amount: amount,
-                Date: date
-            );
-
-            expenses.Add(expense);
-            JsonDataService.SaveData(goals, expenses);
-            Console.Clear();
-            PrintColor("✅ Expense was added!", ConsoleColor.Green);
-        }
-        else
-        {
-            Console.Clear();
-            PrintColor("❌ Error: Invalid category or amount input!", ConsoleColor.Red);
-        }
-    }
-
-    static void ShowExpenses()
-    {
-        decimal TotalExpensesSum = 0;
-
-        Console.Clear();
-        PrintColor("\n╔══════════════════════════════════════╗", ConsoleColor.DarkBlue);
-        PrintColor("║           📋 EXPENSES LIST           ║", ConsoleColor.DarkBlue);
-        PrintColor("╚══════════════════════════════════════╝\n", ConsoleColor.DarkBlue);
-
-        if (expenses.Count == 0)
-        {
-            Console.Clear();
-            PrintColor("⚠️ Expenses list is empty!", ConsoleColor.Yellow);
-        }
-        else
-        {
-            for (int i = 0; i < expenses.Count; i++)
-            {
-                Console.WriteLine($"┌─[{i + 1}]─ {expenses[i].Description}");
-                Console.WriteLine($"│   Category: {expenses[i].Category}");
-                Console.WriteLine($"│   Amount: {expenses[i].Amount:C}");
-                Console.WriteLine($"│   Date: {expenses[i].DateDisplay}");
-                Console.WriteLine($"└─────────────────────────────────────");
-
-                TotalExpensesSum += expenses[i].Amount;
-            }
-
-            Console.Write("\n💰 Total spent: ");
-            PrintColor($"{TotalExpensesSum:C}", ConsoleColor.DarkGreen);
-        }
-    }
-
-    static void ShowMotivation()
-    {
-        string[] quotes = 
-        {
-            "💰 Every euro in your account is a step towards your dream!",
-            "🎯 You're on the right track!",
-            "💪 Financial discipline is a superpower!",
-            "📈 Small savings grow into big opportunities!",
-            "🔥 Consistency beats intensity in finances!",
-            "💎 Smart spending today = freedom tomorrow!"
-        };
-        PrintColor(quotes[new Random().Next(quotes.Length)], ConsoleColor.Cyan);
-    }
-
-    static void ShowAnalytics()
-    {
-        Console.Clear();
-        PrintColor("\n╔══════════════════════════════════════╗", ConsoleColor.Magenta);
-        PrintColor("║             📊 ANALYTICS             ║", ConsoleColor.Magenta);
-        PrintColor("╚══════════════════════════════════════╝\n", ConsoleColor.Magenta);
-
-        if (expenses.Count == 0)
-        {
-            Console.Clear();
-            PrintColor("⚠️ No expenses to analyze yet!", ConsoleColor.Yellow);
-            return;
-        }
-
-        ExpenseCategory topCtg = ExpenseCategory.Other;
-        List<(ExpenseCategory categoryName, decimal total)> overspentCategories = [];
-        decimal maxAmount = 0;
-        decimal minExpense = decimal.MaxValue;
-        decimal maxExpense = 0;
-        decimal allExpensesTotal = 0;
-        decimal averageExpenseSum;
-
-        foreach (var expense in expenses)
-        {
-            allExpensesTotal += expense.Amount;
-        }
-
-        foreach (ExpenseCategory category in Enum.GetValues(typeof(ExpenseCategory)))
-        {
-            decimal categoryTotal = 0;
-            bool overspent = false;
-
-            foreach (var expense in expenses)
-            {
-                if (expense.Category == category)
-                {
-                    categoryTotal += expense.Amount;
-                }
-
-                if (expense.Amount > maxExpense)
-                {
-                    maxExpense = expense.Amount;
-                }
-
-                if (expense.Amount < minExpense)
-                {
-                    minExpense = expense.Amount;
-                }
-            }
-
-            if (categoryTotal > maxAmount)
-            {
-                maxAmount = categoryTotal;
-                topCtg = category;
-            }
-
-            int barSymbolCount = (int)(categoryTotal / allExpensesTotal * 50);
-
-            if (barSymbolCount > 30)
-            {
-                barSymbolCount = 30;
-            }
-
-            if (categoryTotal > categoryBudgets[category])
-            {
-                overspent = true;
-            }
-
-            if (categoryTotal > 0)
-            {
-                decimal percentageCtg = categoryTotal / allExpensesTotal;
-                Console.WriteLine($"{category, -15} {new string('█', barSymbolCount)} {categoryTotal:C} ({percentageCtg:P2})");
-            }
-
-            if (overspent == true)
-            {
-                overspentCategories.Add((category, categoryTotal));
-            }
-        }
-
-        averageExpenseSum = allExpensesTotal / expenses.Count;
-        
-        Console.WriteLine();
-        RecommendationEngine.GenerateTips(goals, expenses);
-
-        Console.WriteLine();
-        for (int i = 0; i < overspentCategories.Count; i++)
-        {
-            Console.Write($"{overspentCategories[i].categoryName} -> ");
-            PrintColor("⚠️ Overspent budget!", ConsoleColor.Yellow, false);
-            Console.WriteLine($" ({overspentCategories[i].total:C} / {categoryBudgets[overspentCategories[i].categoryName]:C})");
-        }
-
-        Console.WriteLine($"\n🧾 Transactions: {expenses.Count}");
-        Console.WriteLine($"⚖️ Average: {averageExpenseSum:C}");
-        Console.WriteLine($"🔺 Max spent: {maxExpense:C}");
-        Console.WriteLine($"🔻 Min spent: {minExpense:C}");
-        Console.Write("\n🏆 Top category: ");
-        PrintColor($"{topCtg}", ConsoleColor.DarkYellow);
-    }
-
-    static void ManageBudgets()
-    {
-        Console.Clear();
-        PrintColor("\n╔══════════════════════════════════════╗", ConsoleColor.Blue);
-        PrintColor("║          💰 MANAGE BUDGETS           ║", ConsoleColor.Blue);
-        PrintColor("╚══════════════════════════════════════╝\n", ConsoleColor.Blue);
-
-        List<(ExpenseCategory categoryName, decimal total)> allCategories = [];
-
-        foreach (ExpenseCategory category in Enum.GetValues(typeof(ExpenseCategory)))
-        {
-            decimal categoryTotal = 0;
-
-            foreach (var expense in expenses)
-            {
-                if (expense.Category == category)
-                {
-                    categoryTotal += expense.Amount;
-                }
-            }
-
-            allCategories.Add((category, categoryTotal));
-        }
-
-        Console.WriteLine($"{"Category", -15} {"Spent", 9} {"Budget", 13} {"Status", 10}");
-        Console.WriteLine(new string('─', 58));
-
-        foreach (KeyValuePair<ExpenseCategory, decimal> categoryBudget in categoryBudgets)
-        {
-            foreach (var (categoryName, total) in allCategories)
-            {
-                if (categoryBudget.Key == categoryName)
-                {
-                    int index = (int)categoryBudget.Key + 1;
-
-                    if (total > categoryBudget.Value)
-                    {
-                        Console.Write($"[{index}] {categoryBudget.Key, -15} ");
-                        PrintColor($"{total, 10:C}", ConsoleColor.Red, false);
-                        Console.Write($" / {categoryBudget.Value, 10:C} ");
-                        PrintColor("⚠️ OVERS", ConsoleColor.Red);
-                    }
-                    else
-                    {
-                        Console.Write($"[{index}] {categoryBudget.Key, -15} {total, 10:C} / {categoryBudget.Value, 10:C} ");
-                        PrintColor("✅ OK", ConsoleColor.Green);
-                    }
-                }
-            }
-        }
-
-        Console.WriteLine("\nMENU:");
-        Console.WriteLine("1. Edit budget");
-        Console.WriteLine("2. Main menu");
-        Console.Write("\nChoose option: ");
-        string? optionInput = Console.ReadLine();
-
-        if (int.TryParse(optionInput, out int option))
-        {
-            switch(option)
-            {
-                case 1:
-                    Console.WriteLine("BUDGET EDIT");
-                    Console.Write("Enter number of category: ");
-                    string? ctgNumberInput = Console.ReadLine();
-
-                    if (int.TryParse(ctgNumberInput, out int ctgNumber))
-                    {
-                        Console.Write("Enter new category budget: ");
-                        string? newBudgetInput = Console.ReadLine();
-
-                        if (decimal.TryParse(newBudgetInput, out decimal newBudget))
-                        {
-                            ExpenseCategory categoryName = (ExpenseCategory)(ctgNumber - 1);
-
-                            categoryBudgets[categoryName] = newBudget;
-                            JsonDataService.SaveBudgets(categoryBudgets);
-                            Console.Clear();
-                            Console.WriteLine($"✅ Budget of category '{categoryName}' changed to {newBudget:C}");
-                        }
-                        else
-                        {
-                            PrintColor("❌ Error: Wrong input format", ConsoleColor.Red);
-                        }
-                    }
-                    else
-                    {
-                        PrintColor("❌ Error: Wrong input format!", ConsoleColor.Red);
-                    }
-                    break;
-                case 2:
-                    Console.Clear();
-                    break;
-                default:
-                    Console.Clear();
-                    PrintColor("⚠️ Wrong menu index!", ConsoleColor.Yellow);
-                    break;
-            }
-        }
-        else
-        {
-            Console.Clear();
-            PrintColor("❌ Error: Wrong input format!", ConsoleColor.Red);
-        }
-    }
-
+    /// <summary>
+    /// Main entry point of the Finance Flow Planner application
+    /// Responsible for initialization, main loop, and cleanup
+    /// </summary>
     static void Main()
     {
-        System.Globalization.CultureInfo.DefaultThreadCurrentCulture =
-        new System.Globalization.CultureInfo("de-DE");
+        // Set German culture for consistent currency formatting (€ symbol, decimal separators)
+        CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("de-DE");
+        CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("de-DE");
 
-        System.Globalization.CultureInfo.DefaultThreadCurrentUICulture =
-        new System.Globalization.CultureInfo("de-DE");
+        Console.Clear();  // Start with clean console
+        Console.WriteLine();  // Empty line for better visual spacing
+        
+        // Show motivational quote to encourage users
+        MotivationService.ShowMotivation();
 
-        Console.WriteLine();
-        ShowMotivation();
-
+        // Load persisted data from JSON files
         var (loadedGoals, loadedExpenses) = JsonDataService.LoadData();
         goals = loadedGoals;
         expenses = loadedExpenses;
+        
+        // Load category budgets (separate from main data)
+        categoryBudgets = JsonDataService.LoadBudgets();
 
-        var loadedBudgets = JsonDataService.LoadBudgets();
-        categoryBudgets = loadedBudgets;
-
+        // Main application loop - runs until user chooses to exit
         while (true)
         {
-            ShowMenu();
+            // Display main menu with all available options
+            MenuManager.ShowMainMenu();
             string? choiceInput = Console.ReadLine();
 
+            // Validate and parse user input
             if (int.TryParse(choiceInput, out int choice))
             {
+                // Route user choice to appropriate functionality
                 switch (choice)
                 {
-                    case 0:
-                        JsonDataService.SaveData(goals, expenses);
+                    case 0:  // Exit application
+                        JsonDataService.SaveData(goals, expenses);  // Persist before exit
                         Console.WriteLine("Closing program...");
-                        return;
-                    case 1:
-                        AddFinancialGoal();
+                        return;  // Exit Main() method, ending the program
+                        
+                    case 1:  // Add new financial goal
+                        GoalManager.AddFinancialGoal();
                         break;
-                    case 2:
-                        ShowGoals();
+                        
+                    case 2:  // View existing goals
+                        MenuManager.ShowGoals();
                         break;
-                    case 3:
-                        AddExpense();
+                        
+                    case 3:  // Add new expense
+                        ExpenseManager.AddExpense();
                         break;
-                    case 4:
-                        ShowExpenses();
+                        
+                    case 4:  // View expense history
+                        MenuManager.ShowExpenses();
                         break;
-                    case 5:
-                        ManageBudgets();
+                        
+                    case 5:  // Manage category budgets
+                        BudgetManager.ManageBudgets();
                         break;
-                    case 6:
-                        ShowAnalytics();
+                        
+                    case 6:  // Show spending analytics and insights
+                        MenuManager.ShowAnalytics();
                         break;
-                    default:
+                        
+                    default:  // Invalid menu option
                         Console.Clear();
-                        PrintColor("⚠️ Wrong menu index!", ConsoleColor.Yellow);
+                        ColorPrinter.PrintColor("⚠️ Wrong menu index!", ConsoleColor.Yellow);
                         break;
                 }
             }
-            else
+            else  // Non-numeric input
             {
                 Console.Clear();
-                PrintColor("❌ Error: Wrong input format!", ConsoleColor.Red);
+                ColorPrinter.PrintColor("❌ Error: Wrong input format!", ConsoleColor.Red);
             }
         }
     }

@@ -27,7 +27,7 @@ public static class JsonDataService
         }
         catch (Exception ex)
         {
-            Program.PrintColor($"⚠️ Error saving data: {ex.Message}", ConsoleColor.Red);
+            ColorPrinter.PrintColor($"⚠️ Error saving data: {ex.Message}", ConsoleColor.Red);
         }
     }
 
@@ -53,13 +53,13 @@ public static class JsonDataService
         }
         catch (JsonException)
         {
-            Program.PrintColor("⚠️ Corrupted save file. Starting fresh!", ConsoleColor.Yellow);
+            ColorPrinter.PrintColor("⚠️ Corrupted save file. Starting fresh!", ConsoleColor.Yellow);
 
             return ([], []);
         }
         catch (Exception ex)
         {
-            Program.PrintColor($"⚠️ Error loading data: {ex.Message}", ConsoleColor.Red);
+            ColorPrinter.PrintColor($"⚠️ Error loading data: {ex.Message}", ConsoleColor.Red);
 
             return ([], []);
         }
@@ -94,7 +94,7 @@ public static class JsonDataService
         }
         catch (Exception ex)
         {
-            Program.PrintColor($"⚠️ Error saving data: {ex.Message}", ConsoleColor.Red);
+            ColorPrinter.PrintColor($"⚠️ Error saving data: {ex.Message}", ConsoleColor.Red);
         }
     }
 
@@ -115,13 +115,13 @@ public static class JsonDataService
         }
         catch (JsonException)
         {
-            Program.PrintColor("⚠️ Corrupted save file. Starting fresh!", ConsoleColor.Yellow);
+            ColorPrinter.PrintColor("⚠️ Corrupted save file. Starting fresh!", ConsoleColor.Yellow);
 
             return GetDefaultBudgets();
         }
         catch (Exception ex)
         {
-            Program.PrintColor($"⚠️ Error loading data: {ex.Message}", ConsoleColor.Red);
+            ColorPrinter.PrintColor($"⚠️ Error loading data: {ex.Message}", ConsoleColor.Red);
 
             return GetDefaultBudgets();
         }
