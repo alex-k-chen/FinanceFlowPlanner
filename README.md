@@ -8,10 +8,13 @@ A personal financial planning console application built with C# .NET that helps 
 <img width="361" height="368" alt="image" src="https://github.com/user-attachments/assets/88568679-1674-427f-a614-23cd6f4849f4" />
 
 #### ```Goals Tracking - Progress visualization with deadlines```
-<img width="358" height="385" alt="image" src="https://github.com/user-attachments/assets/9397f32f-ef6c-4d0a-a040-8cd96cd3f769" />
+<img width="360" height="627" alt="image" src="https://github.com/user-attachments/assets/252b2c3f-bf67-4bb1-9314-1420bb925b74" />
 
 #### ```Expense Management - Category-based tracking```
-<img width="353" height="514" alt="image" src="https://github.com/user-attachments/assets/6417d228-9c58-4688-8f89-1c02e57f9b8d" />
+<img width="368" height="653" alt="image" src="https://github.com/user-attachments/assets/b51ab891-35cf-477a-a02f-8fc2d7948fbd" />
+
+#### ```Budget Dashboard - Visual tracking with instant overspend warnings```
+<img width="516" height="433" alt="image" src="https://github.com/user-attachments/assets/21a02fc8-ff69-40b2-9afb-ed0463213211" />
 
 #### ```Financial Analytics - Spending breakdown by category with visual statistics```
 <img width="523" height="557" alt="image" src="https://github.com/user-attachments/assets/e4581d0d-0966-4009-8624-6d0ffb4cfe08" />
