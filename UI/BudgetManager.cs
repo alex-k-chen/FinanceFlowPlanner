@@ -22,11 +22,13 @@ public static class BudgetManager
             }
             else
             {
+                Console.Clear();
                 ColorPrinter.PrintColor("❌ Error: Wrong input format", ConsoleColor.Red);
             }
         }
         else
         {
+            Console.Clear();
             ColorPrinter.PrintColor("❌ Error: Wrong input format!", ConsoleColor.Red);
         }
     }
@@ -34,9 +36,7 @@ public static class BudgetManager
     public static void ManageBudgets()
     {
         Console.Clear();
-        ColorPrinter.PrintColor("\n╔══════════════════════════════════════╗", ConsoleColor.Blue);
-        ColorPrinter.PrintColor("║          💰 MANAGE BUDGETS           ║", ConsoleColor.Blue);
-        ColorPrinter.PrintColor("╚══════════════════════════════════════╝\n", ConsoleColor.Blue);
+        ConsoleRenderer.DrawHeader("            💰 MANAGE BUDGETS            ", ConsoleColor.Blue);
 
         List<(ExpenseCategory categoryName, decimal total)> allCategories = [];
 
@@ -56,7 +56,7 @@ public static class BudgetManager
         }
 
         Console.WriteLine($"{"Category", -15} {"Spent", 9} {"Budget", 13} {"Status", 10}");
-        Console.WriteLine(new string('─', 58));
+        Console.WriteLine(new string('─', 54));
 
         foreach (KeyValuePair<ExpenseCategory, decimal> categoryBudget in Program.categoryBudgets)
         {

@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 public enum ExpenseCategory
 {
     Food,
-    Transport, 
+    Transport,
     Entertainment,
     Bills,
     Shopping,

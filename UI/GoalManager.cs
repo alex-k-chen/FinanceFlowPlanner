@@ -47,25 +47,34 @@ public static class GoalManager
 
         if (int.TryParse(goalNumInput, out int goalNum))
         {
-            Console.WriteLine($"[{goalNum}] {Program.goals[goalNum - 1].Name}");
-
-            Console.Write("Write new goal name: ");
-            string? newGoalName = Console.ReadLine();
-
-            if (!string.IsNullOrWhiteSpace(newGoalName))
+            if (goalNum > 0 && goalNum <= Program.goals.Count)
             {
-                Program.goals[goalNum - 1] = Program.goals[goalNum - 1] with
-                {
-                    Name = newGoalName
-                };
+                Console.WriteLine($"[{goalNum}] {Program.goals[goalNum - 1].Name}");
 
-                JsonDataService.SaveFinanceData(Program.goals, Program.expenses);
-                Console.Clear();
-                ColorPrinter.PrintColor("✅ Goal name changed!", ConsoleColor.Green);
+                Console.Write("Write new goal name: ");
+                string? newGoalName = Console.ReadLine();
+
+                if (!string.IsNullOrWhiteSpace(newGoalName))
+                {
+                    Program.goals[goalNum - 1] = Program.goals[goalNum - 1] with
+                    {
+                        Name = newGoalName
+                    };
+
+                    JsonDataService.SaveFinanceData(Program.goals, Program.expenses);
+                    Console.Clear();
+                    ColorPrinter.PrintColor("✅ Goal name changed!", ConsoleColor.Green);
+                }
+                else
+                {
+                    Console.Clear();
+                    ColorPrinter.PrintColor("⚠️ Empty goal name!", ConsoleColor.Yellow);
+                }
             }
             else
             {
-                ColorPrinter.PrintColor("⚠️ Empty goal name!", ConsoleColor.Yellow);
+                Console.Clear();
+                ColorPrinter.PrintColor("❌ Error: Goal does not exist!", ConsoleColor.Red);
             }
         }
         else

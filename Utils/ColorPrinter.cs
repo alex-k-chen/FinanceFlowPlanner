@@ -1,4 +1,3 @@
-
 public static class ColorPrinter
 {
     public static void PrintColor(string text, ConsoleColor color, bool makeEnter = true)

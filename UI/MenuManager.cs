@@ -6,10 +6,8 @@ public static class MenuManager
 {
     public static void ShowMainMenu()
     {
-        ColorPrinter.PrintColor("\n╔══════════════════════════════════════╗", ConsoleColor.Green);
-        ColorPrinter.PrintColor("║       💸 FINANCE FLOW PLANNER        ║", ConsoleColor.Green);
-        ColorPrinter.PrintColor("╚══════════════════════════════════════╝", ConsoleColor.Green);
-        Console.WriteLine("\nMAIN MENU:");
+        ConsoleRenderer.DrawHeader("💸 FINANCE FLOW PLANNER", ConsoleColor.Green);
+        Console.WriteLine("MAIN MENU:");
         Console.WriteLine("1. 📝 Add financial goal");
         Console.WriteLine("2. 🎯 View goals");
         Console.WriteLine("3. 💸 Add expense");
@@ -23,9 +21,7 @@ public static class MenuManager
     public static void ShowGoals()
     {
         Console.Clear();
-        ColorPrinter.PrintColor("\n╔══════════════════════════════════════╗", ConsoleColor.DarkBlue);
-        ColorPrinter.PrintColor("║            📋 GOALS LIST             ║", ConsoleColor.DarkBlue);
-        ColorPrinter.PrintColor("╚══════════════════════════════════════╝\n", ConsoleColor.DarkBlue);
+        ConsoleRenderer.DrawHeader("     📋 GOALS LIST     ", ConsoleColor.DarkBlue);
 
         if (Program.goals.Count == 0)
         {
@@ -78,9 +74,7 @@ public static class MenuManager
         decimal TotalExpensesSum = 0;
 
         Console.Clear();
-        ColorPrinter.PrintColor("\n╔══════════════════════════════════════╗", ConsoleColor.DarkBlue);
-        ColorPrinter.PrintColor("║           📋 EXPENSES LIST           ║", ConsoleColor.DarkBlue);
-        ColorPrinter.PrintColor("╚══════════════════════════════════════╝\n", ConsoleColor.DarkBlue);
+        ConsoleRenderer.DrawHeader("    📋 EXPENSES LIST    ", ConsoleColor.DarkBlue);
 
         if (Program.expenses.Count == 0)
         {
@@ -95,22 +89,43 @@ public static class MenuManager
                 Console.WriteLine($"│   Category: {Program.expenses[i].Category}");
                 Console.WriteLine($"│   Amount: {Program.expenses[i].Amount:C}");
                 Console.WriteLine($"│   Date: {Program.expenses[i].DateDisplay}");
-                Console.WriteLine($"└─────────────────────────────────────");
+                Console.WriteLine($"└────────────────────────────────────");
 
                 TotalExpensesSum += Program.expenses[i].Amount;
             }
 
             Console.Write("\n💰 Total spent: ");
             ColorPrinter.PrintColor($"{TotalExpensesSum:C}", ConsoleColor.DarkGreen);
+
+            Console.WriteLine("\nMENU:");
+            Console.WriteLine("1. Edit expense");
+            Console.WriteLine("2. Main menu");
+            Console.Write("\nChoose option: ");
+            string? optionInput = Console.ReadLine();
+
+            if (int.TryParse(optionInput, out int option))
+            {
+                switch(option)
+                {
+                    case 1:
+                        ExpenseManager.EditExpense();
+                        break;
+                    case 2:
+                        Console.Clear();
+                        break;
+                    default:
+                        Console.Clear();
+                        ColorPrinter.PrintColor("⚠️ Wrong menu index!", ConsoleColor.Yellow);
+                        break;
+                }
+            }
         }
     }
 
     public static void ShowAnalytics()
     {
         Console.Clear();
-        ColorPrinter.PrintColor("\n╔══════════════════════════════════════╗", ConsoleColor.Magenta);
-        ColorPrinter.PrintColor("║             📊 ANALYTICS             ║", ConsoleColor.Magenta);
-        ColorPrinter.PrintColor("╚══════════════════════════════════════╝\n", ConsoleColor.Magenta);
+        ConsoleRenderer.DrawHeader("              📊 ANALYTICS              ", ConsoleColor.Magenta);
 
         if (Program.expenses.Count == 0)
         {
