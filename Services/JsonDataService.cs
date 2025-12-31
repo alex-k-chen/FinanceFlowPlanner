@@ -5,7 +5,7 @@ public static class JsonDataService
     private const string FileName = "finance_data.json";
     private const string FileNameBudgets = "budgets.json";
 
-    public static void SaveData(List<FinancialGoal> goals, List<Expense> expenses)
+    public static void SaveFinanceData(List<FinancialGoal> goals, List<Expense> expenses)
     {
         try
         {

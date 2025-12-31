@@ -45,7 +45,7 @@ class Program
                 switch (choice)
                 {
                     case 0:  // Exit application
-                        JsonDataService.SaveData(goals, expenses);  // Persist before exit
+                        JsonDataService.SaveFinanceData(goals, expenses);  // Persist before exit
                         Console.WriteLine("Closing program...");
                         return;  // Exit Main() method, ending the program
                         

@@ -39,7 +39,7 @@ public static class ExpenseManager
             );
 
             Program.expenses.Add(expense);
-            JsonDataService.SaveData(Program.goals, Program.expenses);
+            JsonDataService.SaveFinanceData(Program.goals, Program.expenses);
             Console.Clear();
             ColorPrinter.PrintColor("✅ Expense was added!", ConsoleColor.Green);
         }

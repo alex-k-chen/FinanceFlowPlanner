@@ -1,4 +1,7 @@
 
+using System.Drawing;
+using System.Security.Cryptography.X509Certificates;
+
 public static class MenuManager
 {
     public static void ShowMainMenu()
@@ -40,50 +43,32 @@ public static class MenuManager
                 Console.WriteLine($"│   Deadline: {Program.goals[i].DeadlineDisplay}");
                 Console.WriteLine($"└─────────────────────────────────────");
             }
-            Console.Write("\nAdd money to some goal? (y/n): ");
-            string? add_money_input = Console.ReadLine();
 
-            if (char.TryParse(add_money_input, out char add_money) && (add_money == 'y' || add_money == 'Y'))
+            Console.WriteLine("\nMENU:");
+            Console.WriteLine("1. Add money");
+            Console.WriteLine("2. Edit goal");
+            Console.WriteLine("3. Main menu");
+            Console.Write("\nChoose option: ");
+            string? optionInput = Console.ReadLine();
+
+            if (int.TryParse(optionInput, out int option))
             {
-                Console.Write("Enter the goal number: ");
-                string? goalNumInput = Console.ReadLine();
-
-                if (int.TryParse(goalNumInput, out int goalNum))
+                switch(option)
                 {
-                    if (goalNum < 1 || goalNum > Program.goals.Count)
-                    {
+                    case 1:
+                        GoalManager.AddMoneyToGoal();
+                        break;
+                    case 2:
+                        GoalManager.EditGoal();
+                        break;
+                    case 3:
                         Console.Clear();
-                        ColorPrinter.PrintColor("❌ Error: The goal doesn't exist!", ConsoleColor.Red);
-                    }
-                    else
-                    {
-                        Console.Write("Enter sum of money: ");
-                        string? sumInput = Console.ReadLine();
-
-                        if (decimal.TryParse(sumInput, out decimal sum) && sum > 0)
-                        {
-                            Program.goals[goalNum - 1] = Program.goals[goalNum - 1].AddMoney(sum);
-                            JsonDataService.SaveData(Program.goals, Program.expenses);
-                            Console.Clear();
-                            ColorPrinter.PrintColor($"✅ {sum:C} was added!", ConsoleColor.Green);
-                            return;
-                        }
-                        else
-                        {
-                            Console.Clear();
-                            ColorPrinter.PrintColor("❌ Error: The sum must be a positive number!", ConsoleColor.Red);
-                        }
-                    }
+                        break;
+                    default:
+                        Console.Clear();
+                        ColorPrinter.PrintColor("⚠️ Wrong menu index!", ConsoleColor.Yellow);
+                        break;
                 }
-                else
-                {
-                    Console.Clear();
-                    ColorPrinter.PrintColor("❌ Error: Enter a number!", ConsoleColor.Red);
-                }
-            }
-            else
-            {
-                Console.Clear();
             }
         }
     }

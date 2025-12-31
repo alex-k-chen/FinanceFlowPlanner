@@ -1,5 +1,36 @@
 public static class BudgetManager
 {
+    static void EditBudget()
+    {
+        Console.WriteLine("BUDGET EDIT");
+        Console.Write("Enter number of category: ");
+        string? ctgNumberInput = Console.ReadLine();
+
+        if (int.TryParse(ctgNumberInput, out int ctgNumber))
+        {
+            Console.Write("Enter new category budget: ");
+            string? newBudgetInput = Console.ReadLine();
+
+            if (decimal.TryParse(newBudgetInput, out decimal newBudget))
+            {
+                ExpenseCategory categoryName = (ExpenseCategory)(ctgNumber - 1);
+
+                Program.categoryBudgets[categoryName] = newBudget;
+                JsonDataService.SaveBudgets(Program.categoryBudgets);
+                Console.Clear();
+                Console.WriteLine($"✅ Budget of category '{categoryName}' changed to {newBudget:C}");
+            }
+            else
+            {
+                ColorPrinter.PrintColor("❌ Error: Wrong input format", ConsoleColor.Red);
+            }
+        }
+        else
+        {
+            ColorPrinter.PrintColor("❌ Error: Wrong input format!", ConsoleColor.Red);
+        }
+    }
+    
     public static void ManageBudgets()
     {
         Console.Clear();
@@ -62,33 +93,7 @@ public static class BudgetManager
             switch(option)
             {
                 case 1:
-                    Console.WriteLine("BUDGET EDIT");
-                    Console.Write("Enter number of category: ");
-                    string? ctgNumberInput = Console.ReadLine();
-
-                    if (int.TryParse(ctgNumberInput, out int ctgNumber))
-                    {
-                        Console.Write("Enter new category budget: ");
-                        string? newBudgetInput = Console.ReadLine();
-
-                        if (decimal.TryParse(newBudgetInput, out decimal newBudget))
-                        {
-                            ExpenseCategory categoryName = (ExpenseCategory)(ctgNumber - 1);
-
-                            Program.categoryBudgets[categoryName] = newBudget;
-                            JsonDataService.SaveBudgets(Program.categoryBudgets);
-                            Console.Clear();
-                            Console.WriteLine($"✅ Budget of category '{categoryName}' changed to {newBudget:C}");
-                        }
-                        else
-                        {
-                            ColorPrinter.PrintColor("❌ Error: Wrong input format", ConsoleColor.Red);
-                        }
-                    }
-                    else
-                    {
-                        ColorPrinter.PrintColor("❌ Error: Wrong input format!", ConsoleColor.Red);
-                    }
+                    EditBudget();
                     break;
                 case 2:
                     Console.Clear();
