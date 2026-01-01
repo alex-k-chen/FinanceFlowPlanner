@@ -14,6 +14,7 @@ public static class MenuManager
         Console.WriteLine("4. 📈 View expenses");
         Console.WriteLine("5. 💰 Manage budgets");
         Console.WriteLine("6. 📊 Show analytics");
+        Console.WriteLine("7. 📱 Export data");
         Console.WriteLine("0. 🚪 Exit");
         Console.Write("\nChoose option: ");
     }

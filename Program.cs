@@ -72,6 +72,10 @@ class Program
                     case 6:  // Show spending analytics and insights
                         MenuManager.ShowAnalytics();
                         break;
+
+                    case 7: // Export data in PDF
+                        PdfExportService.PdfExport();
+                        break;
                         
                     default:  // Invalid menu option
                         Console.Clear();
