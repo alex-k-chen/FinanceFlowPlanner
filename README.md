@@ -5,19 +5,22 @@ A personal financial planning console application built with C# .NET that helps 
 ## 📸 Preview
 
 #### ```Main Menu - Colorful interface with navigation options```
-<img width="361" height="368" alt="image" src="https://github.com/user-attachments/assets/88568679-1674-427f-a614-23cd6f4849f4" />
+<img width="409" height="394" alt="image" src="https://github.com/user-attachments/assets/94e0caf7-6ef1-4094-95b4-0f60854e597f" />
 
 #### ```Goals Tracking - Progress visualization with deadlines```
 <img width="360" height="627" alt="image" src="https://github.com/user-attachments/assets/252b2c3f-bf67-4bb1-9314-1420bb925b74" />
 
 #### ```Expense Management - Category-based tracking```
-<img width="368" height="653" alt="image" src="https://github.com/user-attachments/assets/b51ab891-35cf-477a-a02f-8fc2d7948fbd" />
+<img width="367" height="695" alt="image" src="https://github.com/user-attachments/assets/870f6136-449a-4312-a2b5-318ec6b051c8" />
 
 #### ```Budget Dashboard - Visual tracking with instant overspend warnings```
 <img width="516" height="433" alt="image" src="https://github.com/user-attachments/assets/21a02fc8-ff69-40b2-9afb-ed0463213211" />
 
 #### ```Financial Analytics - Spending breakdown by category with visual statistics```
 <img width="523" height="557" alt="image" src="https://github.com/user-attachments/assets/e4581d0d-0966-4009-8624-6d0ffb4cfe08" />
+
+#### ```Data Export Functionality - PDF Report Generation and Financial Documentation System```
+<img width="868" height="1006" alt="image" src="https://github.com/user-attachments/assets/684d1b96-f301-426f-92d6-325a0abbf252" />
 
 ## ✨ Features
 
