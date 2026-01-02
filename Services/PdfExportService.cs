@@ -178,7 +178,7 @@ public class PdfExportService
                                         table.Cell().Text($"{i + 1}").FontSize(10);
                                         table.Cell().Text(expense.DateDisplay).FontSize(10);
                                         table.Cell().Text(expense.Description).FontSize(11);
-                                        table.Cell().Text(expense.Category).FontSize(10);
+                                        table.Cell().Text(expense.Category.ToString()).FontSize(10);
                                         table.Cell().Text($"{expense.Amount:C}").AlignRight().FontSize(11);
                                     }
                                     
