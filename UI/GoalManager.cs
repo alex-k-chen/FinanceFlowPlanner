@@ -23,7 +23,7 @@ public static class GoalManager
                     JsonDataService.SaveFinanceData(Program.goals, Program.expenses);
                     Console.Clear();
                     ColorPrinter.PrintColor($"✅ {sum:C}", ConsoleColor.Green, false);
-                    Console.WriteLine(" was added!");
+                    Console.WriteLine($" was added to '{Program.goals[goalNum - 1].Name}'!");
                     return;
                 }
                 else

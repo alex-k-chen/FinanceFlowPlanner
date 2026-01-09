@@ -14,11 +14,33 @@ public class RecommendationEngine
             }
         }
 
+        Console.WriteLine();
+
         foreach (var goal in goals)
         {
             if (goal.CurrentAmount == 0)
             {
-                Console.WriteLine($"⏳ Start saving for: {goal.Name}");
+                Console.WriteLine($"⏳ '{goal.Name}' has no savings yet!");
+            }
+            
+            if (!goal.Deadline.HasValue)
+            {
+                ColorPrinter.PrintColor($"⚠️ Goal '{goal.Name}' has no deadline set!\n", ConsoleColor.Yellow);
+                continue;
+            }
+
+            TimeSpan daysLeft = goal.Deadline.Value - DateTime.Now;
+
+            if (daysLeft.Days < 100)
+            {
+                decimal dailyNeeded = goal.RemainingAmount / daysLeft.Days;
+
+                if (dailyNeeded > 0)
+                {
+                    Console.WriteLine($"‼️ You have only {daysLeft.Days} days left to achive your goal: '{goal.Name}'!");
+                    Console.WriteLine($"💡 You need to save {dailyNeeded:C} daily to achive this goal!");
+                    Console.WriteLine();
+                }
             }
         }
     }
