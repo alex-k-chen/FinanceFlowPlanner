@@ -6,7 +6,7 @@ A personal financial planning console application built with C# .NET that helps 
 
 #### ```Main Menu - Colorful interface with navigation options```
 <img width="409" height="394" alt="image" src="https://github.com/user-attachments/assets/94e0caf7-6ef1-4094-95b4-0f60854e597f" />
-
+ 
 #### ```Goals Tracking - Progress visualization with deadlines```
 <img width="360" height="627" alt="image" src="https://github.com/user-attachments/assets/252b2c3f-bf67-4bb1-9314-1420bb925b74" />
 
